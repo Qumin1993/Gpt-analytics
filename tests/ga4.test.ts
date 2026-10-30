@@ -25,3 +25,4 @@ describe('GA4 reporting', () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 });
+it('rejects February 30',async()=>{const f=vi.fn();await expect(getGa4Summary({propertyId:'123',startDate:'2026-02-30',endDate:'2026-10-30'},'token',f as typeof fetch)).rejects.toThrow();expect(f).not.toHaveBeenCalled();});

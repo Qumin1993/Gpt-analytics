@@ -31,3 +31,9 @@ describe('AdMob reporting', () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 });
+it('accepts Google streaming report JSON array', async () => {
+  const records = [{ header: {} }, { row: { metricValues: { CLICKS: { integerValue: '7' } } } }, { footer: { matchingRowCount: '1' } }];
+  const fetcher = vi.fn().mockResolvedValue(Response.json(records));
+  const result = await getAdMobReport({ publisherId: 'pub-1234567890123456', startDate: '2026-10-01', endDate: '2026-10-30' }, 'token', fetcher as typeof fetch);
+  expect(result).toEqual(records);
+});

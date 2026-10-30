@@ -27,3 +27,12 @@ it("initializes MCP with valid bearer", async () => {
   const data = await response.json() as { result?: { serverInfo?: { name?: string } } };
   expect(data.result?.serverInfo?.name).toBe("gpt-analytics");
 });
+
+it('blocks unauthenticated MCP methods',async()=>{
+ const token='s'.repeat(40);
+ for(const method of ['GET','POST','DELETE','OPTIONS']){
+  const request=new Request('https://local.test/mcp',{method});
+  const response=await worker.fetch(request,{MCP_ACCESS_TOKEN:token});
+  expect(response.status).toBe(401);
+ }
+});

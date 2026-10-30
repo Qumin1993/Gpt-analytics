@@ -13,7 +13,7 @@ export async function getGa4Summary(
 ): Promise<unknown> {
   if (!/^\d{1,20}$/.test(input.propertyId)) throw new Error("Invalid GA4 property ID");
   for (const date of [input.startDate, input.endDate]) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date)) || new Date(date + "T00:00:00Z").toISOString().slice(0,10) !== date) {
       throw new Error("Invalid GA4 date");
     }
   }
