@@ -15,3 +15,6 @@ compatibility_flags = ["global_fetch_strictly_public"]
 [[kv_namespaces]]
 binding = "OAUTH_KV"
 id = "71035b9b751148b29d034d841e0ba97c"
+
+[vars]
+APP_BASE_URL = "https://gpt-analytics-chatgpt.dominisos1.workers.dev"
