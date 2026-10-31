@@ -7,6 +7,7 @@ Read-only Cloudflare Workers MCP server.
 - `search_console_summary`: search performance.
 - `admob_report`: AdMob report.
 - `play_reviews`: Google Play reviews (no replies).
+- `play_list_apps`: list registered Google Play package names (read-only; not automatic discovery).
 - `google_ads_campaigns`: Google Ads campaign metrics.
 
 ## Security and configuration
@@ -53,3 +54,12 @@ The private connector uses `wrangler.plugin.toml` (`gpt-analytics-chatgpt`), not
 Before deployment, the owner must approve deployment and configure the exact HTTPS `APP_BASE_URL`, Google OAuth web-client redirect `<APP_BASE_URL>/google/callback`, secrets `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_ALLOWED_SUB` (stable Google subject, not email), and `GOOGLE_REFRESH_TOKEN` for Google APIs. Configure relevant Google API permissions and Ads developer token as needed. Never commit secrets.
 
 Check `npm test`, `npm run typecheck`, and `npx wrangler deploy --config wrangler.plugin.toml --dry-run`. After authorized deployment, test OAuth discovery, consent, PKCE, wrong-account rejection, unauthenticated `/mcp`, and the five read-only MCP tools in ChatGPT. Existing `MCP_ACCESS_TOKEN` cannot bypass this Worker's OAuth.
+
+## Google Play app registry
+Set `PLAY_APPS_JSON` as a Cloudflare Worker secret on the **ChatGPT plugin Worker** (`wrangler.plugin.toml`). Example value:
+
+```json
+[{"packageName":"com.example.app","name":"Example"}]
+```
+
+Run `npx wrangler secret put PLAY_APPS_JSON --config wrangler.plugin.toml` and enter the JSON when prompted. Never commit real private app inventories or credentials. The `play_list_apps` MCP tool returns the configured registry with `source: configured_registry` and `complete: false` because the Google Play Android Publisher API does not provide a general account-wide app listing endpoint. New apps must be added to the registry manually. This change does not deploy or populate the registry automatically.

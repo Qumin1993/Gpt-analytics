@@ -7,10 +7,12 @@ import type { GoogleAuthEnv } from "../auth/google-oauth.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getGa4Summary } from "../providers/ga4.js";
+import { parsePlayApps } from "../providers/play-apps.js";
 export interface Env extends GoogleAuthEnv {
   MCP_ACCESS_TOKEN?: string;
   GOOGLE_ACCESS_TOKEN?: string;
   GOOGLE_ADS_DEVELOPER_TOKEN?: string;
+  PLAY_APPS_JSON?: string;
 }
 export function createMcpServer(env: Env) {
   const server = new McpServer({ name: "gpt-analytics", version: "0.1.0" });
@@ -60,6 +62,18 @@ export function createMcpServer(env: Env) {
       return { content: [{ type: "text" as const, text: JSON.stringify(data) }] };
     } catch {
       return { content: [{ type: "text" as const, text: "AdMob request failed" }], isError: true };
+    }
+  });
+  server.registerTool("play_list_apps", {
+    description: "List configured Google Play apps. This is a manually maintained registry, not a live Play Console discovery endpoint.",
+    inputSchema: z.object({}),
+    annotations: { readOnlyHint: true }
+  }, async () => {
+    try {
+      const apps = parsePlayApps(env.PLAY_APPS_JSON);
+      return { content: [{ type: "text" as const, text: JSON.stringify({ apps, source: "configured_registry", complete: false }) }] };
+    } catch {
+      return { content: [{ type: "text" as const, text: "Play app registry configuration invalid" }], isError: true };
     }
   });
   server.registerTool("play_reviews", {
