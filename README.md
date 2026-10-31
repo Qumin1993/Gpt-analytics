@@ -45,3 +45,11 @@ Google OAuth consent, API permissions and a Google Ads developer token must be c
 8. Confirm GET /health and test authenticated and unauthenticated MCP requests.
 9. Restrict the shared MCP token to trusted clients. This server does not provide per-user OAuth or multi-tenant isolation.
 10. Rotate compromised secrets immediately. Never print credentials in terminal logs or commit them to Git.
+
+## ChatGPT OAuth Worker
+
+The private connector uses `wrangler.plugin.toml` (`gpt-analytics-chatgpt`), not the legacy Worker. It exposes `/mcp` using `OAUTH_KV` for OAuth state.
+
+Before deployment, the owner must approve deployment and configure the exact HTTPS `APP_BASE_URL`, Google OAuth web-client redirect `<APP_BASE_URL>/google/callback`, secrets `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_ALLOWED_SUB` (stable Google subject, not email), and `GOOGLE_REFRESH_TOKEN` for Google APIs. Configure relevant Google API permissions and Ads developer token as needed. Never commit secrets.
+
+Check `npm test`, `npm run typecheck`, and `npx wrangler deploy --config wrangler.plugin.toml --dry-run`. After authorized deployment, test OAuth discovery, consent, PKCE, wrong-account rejection, unauthenticated `/mcp`, and the five read-only MCP tools in ChatGPT. Existing `MCP_ACCESS_TOKEN` cannot bypass this Worker's OAuth.
