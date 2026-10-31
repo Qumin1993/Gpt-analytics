@@ -1,7 +1,7 @@
 import { it, expect } from "vitest";
 import worker from "../src/index.js";
 
-it("lists five read-only tools over authenticated MCP HTTP", async () => {
+it("lists six read-only tools over authenticated MCP HTTP", async () => {
   const secret = "s".repeat(40);
   const request = new Request("https://local.test/mcp", {
     method: "POST",
@@ -19,7 +19,7 @@ it("lists five read-only tools over authenticated MCP HTTP", async () => {
   const tools = data.result?.tools ?? [];
   expect(tools.map(t => t.name).sort()).toEqual([
     "ga4_summary", "search_console_summary", "admob_report",
-    "play_reviews", "google_ads_campaigns"
+    "play_reviews", "play_list_apps", "google_ads_campaigns"
   ].sort());
   expect(tools.every(t => t.annotations?.readOnlyHint === true)).toBe(true);
 });
